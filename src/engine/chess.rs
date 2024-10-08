@@ -110,7 +110,7 @@ impl Chess {
                 break;
             }
             moves.push(right_pointer << 1);
-            right_pointer = right_pointer << 1;
+            right_pointer <<= 1;
         }
 
         // Parse left
@@ -124,7 +124,7 @@ impl Chess {
                 break;
             }
             moves.push(left_pointer >> 1);
-            left_pointer = left_pointer >> 1;
+            left_pointer >>= 1;
         }
 
         // Parse top
@@ -138,7 +138,7 @@ impl Chess {
                 break;
             }
             moves.push(top_pointer << 8);
-            top_pointer = top_pointer << 8;
+            top_pointer <<= 8;
         }
 
         // Parse bottom
@@ -152,7 +152,7 @@ impl Chess {
                 break;
             }
             moves.push(bottom_pointer >> 8);
-            bottom_pointer = bottom_pointer >> 8;
+            bottom_pointer >>= 8;
         }
         moves.iter().fold(0, |acc, x| (acc | x))
     }
@@ -175,7 +175,7 @@ impl Chess {
                 break;
             }
             moves.push(nw << 9);
-            nw = nw << 9;
+            nw <<= 9;
         }
         // parse north east
         let mut ne = bl;
@@ -188,7 +188,7 @@ impl Chess {
                 break;
             }
             moves.push(ne << 7);
-            ne = ne << 7;
+            ne <<= 7;
         }
         // parse south west
         let mut sw = bl;
@@ -201,7 +201,7 @@ impl Chess {
                 break;
             }
             moves.push(sw >> 7);
-            sw = sw >> 7;
+            sw >>= 7;
         }
         // parse south east
         let mut se = bl;
@@ -214,7 +214,7 @@ impl Chess {
                 break;
             }
             moves.push(se >> 9);
-            se = se >> 9;
+            se >>= 9;
         }
         moves.iter().fold(0, |acc, x| (acc | x))
     }
@@ -277,17 +277,17 @@ impl Chess {
         {
             return Some(found.0 as u8);
         }
-        return None;
+         None
     }
 
     fn get_positions(piece: u64) -> Vec<Position> {
         let mut all_positions = Vec::new();
-        for i in 0..(64 as u64) {
+        for i in 0..64 {
             if (1 << i) & piece > 0 {
-                all_positions.push(Chess::index_to_position(i as u8))
+                all_positions.push(Chess::index_to_position(i ))
             }
         }
-        return all_positions;
+        all_positions
     }
 
     pub fn king_saving_move(&self, piece_idx: u8, position: &Position) -> u64 {
@@ -302,10 +302,10 @@ impl Chess {
             new_chess.dry_move(position, &new_position);
             if !new_chess.is_in_check() {
                 let idx = Chess::position_to_index(&new_position);
-                saving_moves = saving_moves | (1 << idx);
+                saving_moves |= 1 << idx;
             }
         }
-        return saving_moves;
+        saving_moves
     }
 
     pub fn get_possible_moves(&self, position: &Position) -> u64 {
@@ -324,7 +324,7 @@ impl Chess {
                 new_chess.dry_move(position, new_position);
                 if new_chess.is_in_check() {
                     let prune_idx = Chess::position_to_index(new_position);
-                    location = location & !(1 << prune_idx);
+                    location &= !(1 << prune_idx);
                 }
             }
             return location;
@@ -376,10 +376,10 @@ impl Chess {
             if n & 1 > 0 {
                 indices.push(counter)
             }
-            n = n >> 1;
-            counter = counter + 1;
+            n >>= 1;
+            counter += 1;
         }
-        return indices;
+        indices
     }
 
     pub fn contains_piece(&self, pos: &Position) -> bool {
@@ -404,17 +404,17 @@ impl Chess {
 
                 (from, moves)
             })
-            .filter(|vm| vm.1.len() > 0)
+            .filter(|vm| !vm.1.is_empty())
             .collect::<Vec<(Position, Vec<Position>)>>();
         for vm in all_possible.iter() {
             let from = vm.0.clone();
             for to in vm.1.iter() {
                 let mut new_chess = self.clone();
-                new_chess.move_piece(&from, &to);
+                new_chess.move_piece(&from, to);
                 all_pos.push(new_chess);
             }
         }
-        return all_pos;
+        all_pos
     }
 
     pub fn dry_move(&mut self, from: &Position, to: &Position) -> bool {
@@ -430,8 +430,7 @@ impl Chess {
                 }
 
                 // if any piece is in destination, delete the piece
-                self.pieces[to_piece_idx as usize] =
-                    self.pieces[to_piece_idx as usize] & !(1 << to_idx);
+                self.pieces[to_piece_idx as usize] &= !(1 << to_idx);
             }
             // move current piece to destination
             self.pieces[from_piece_idx as usize] =
@@ -464,37 +463,29 @@ impl Chess {
                 Chess::position_to_index(to),
             ));
         }
-        return move_successful;
+        move_successful
     }
 
     pub fn get_piece_indices(for_piece: bool) -> [u8; 6] {
         if for_piece {
             return [0, 1, 2, 3, 4, 5];
         }
-        return [6, 7, 8, 9, 10, 11];
-    }
-
-    pub fn get_king_position_idx(&self) -> u8 {
-        if self.white_turn {
-            5
-        } else {
-            11
-        }
+        [6, 7, 8, 9, 10, 11]
     }
 
     pub fn opponent_all_valid_moves(&self) -> u64 {
         let indices = Chess::get_piece_indices(!self.white_turn);
 
-        let mut valid_moves = 0 as u64;
+        let mut valid_moves = 0;
         for i in indices {
             // check if king is attacked by opponent pieces
             let positions = Chess::get_positions(self.pieces[i as usize]);
             for position in positions.iter() {
                 let vm = self.get_possible_moves_by_piece_idx(i, position, !self.white_turn);
-                valid_moves = valid_moves | vm;
+                valid_moves |= vm;
             }
         }
-        return valid_moves;
+        valid_moves
     }
 
     pub fn is_in_check(&self) -> bool {
@@ -521,7 +512,7 @@ impl Chess {
                 }
             }
         }
-        return true;
+        true
     }
 
     pub fn is_valid_selection(&self, position: &Position) -> bool {

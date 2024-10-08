@@ -1,7 +1,4 @@
-use std::{
-    cmp::{max, min},
-    i32,
-};
+use std::cmp::{max, min};
 
 use rand::{seq::SliceRandom, thread_rng};
 
@@ -10,12 +7,15 @@ use crate::engine::chess::Chess;
 const PIECES_WEIGHT: [i32; 12] = [10, 30, 30, 50, 90, 900, -10, -30, -30, -50, -90, -900];
 
 pub fn evaluate(chess: &Chess) -> i32 {
-    let mut total = 0;
-    for idx in 0..chess.pieces.len() {
-        let n = chess.pieces[idx].count_ones();
-        total = total + (n as i32) * PIECES_WEIGHT[idx];
-    }
-    return total;
+    chess
+        .pieces
+        .iter()
+        .map(|piece| piece.count_ones())
+        .zip(PIECES_WEIGHT.iter())
+        .fold(0, |mut total, (count, weight)| {
+            total += count as i32 * weight;
+            total
+        })
 }
 
 pub async fn minimax(

@@ -1,4 +1,4 @@
-use std::{i32, time::Duration};
+use std::time::Duration;
 
 use bevy::prelude::{EventWriter, Query};
 use bevy_async_task::{AsyncTaskRunner, AsyncTaskStatus};
@@ -29,8 +29,8 @@ pub fn handle_move(
             async_std::task::sleep(Duration::from_millis(800)).await;
         }
         let (chess, _) = minimax(&c, depth, false, i32::MIN, i32::MAX).await;
-        let chess = chess.unwrap();
-        return chess.clone();
+        
+        chess.unwrap()
     }
 
     match async_runner.poll() {

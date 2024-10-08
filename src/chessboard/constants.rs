@@ -1,8 +1,8 @@
 use bevy::color::*;
 
-pub const BLACK: Srgba = Srgba::rgb(0.7176470588235294, 0.7529411764705882, 0.8470588235294118);
-pub const WHITE: Srgba = Srgba::rgb(0.9098039215686274, 0.9294117647058824, 0.9764705882352941);
-pub const BLUE: Srgba = Srgba::new(0.4823529411764706, 0.3803921568627451, 1., 0.8);
+pub const BLACK: Srgba = Srgba::rgb(0.717_647_1, 0.752_941_2, 0.847_058_83);
+pub const WHITE: Srgba = Srgba::rgb(0.909_803_9, 0.929_411_77, 0.976_470_6);
+pub const BLUE: Srgba = Srgba::new(0.482_352_94, 0.380_392_16, 1., 0.8);
 
 pub const DARK_BLACK: Srgba = Srgba::rgb(0., 0., 0.);
 

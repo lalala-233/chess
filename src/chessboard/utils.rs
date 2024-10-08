@@ -20,7 +20,7 @@ pub fn get_indices_of_set_bits(value: u64) -> Vec<u8> {
 pub fn chess_position_to_world_position(chess_position: Position) -> (f32, f32) {
     let x_t = LEFT + chess_position.0 as f32 * SQUARE_SIZE;
     let y_t = BOTTOM + chess_position.1 as f32 * SQUARE_SIZE;
-    return (x_t, y_t);
+    (x_t, y_t)
 }
 
 pub fn world_position_to_chess_position(world_position: (f32, f32)) -> Option<Position> {
@@ -29,9 +29,9 @@ pub fn world_position_to_chess_position(world_position: (f32, f32)) -> Option<Po
         ((world_position.1 + SQUARE_SIZE * 4.) / SQUARE_SIZE).trunc() as i8 + 1,
     );
 
-    if  x <= 8 && x >= 1 && y <= 8 && y >= 1  {
+    if  (1..=8).contains(&x) && (1..=8).contains(&y)  {
         return Some(Position(x as u8, y as u8))
     }
-    return None
+    None
 
 }

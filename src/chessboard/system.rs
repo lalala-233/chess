@@ -27,7 +27,7 @@ pub fn spawn_board(mut commands: Commands) {
     });
 
     for i in 0..2 {
-        let is_white = if i == 0 { true } else { false };
+        let is_white = i == 0;
         let color = if is_white { GREEN.into() } else { GRAY.into() };
         let player_sprite = Sprite {
             color,
@@ -78,19 +78,16 @@ pub fn spawn_texts(mut commands: Commands, asset_server: ResMut<AssetServer>) {
         font: font.clone(),
         color: DARK_BLACK.into(),
         font_size: 90.0,
-        ..default()
     };
     let msg_style = TextStyle {
         font: d_font.clone(),
         color: DARK_BLACK.into(),
         font_size: 40.,
-        ..default()
     };
     let status_style = TextStyle {
         font: d_font.clone(),
         color: WHITE.into(),
         font_size: 32.,
-        ..default()
     };
     let text_justification = JustifyText::Center;
 
@@ -142,7 +139,7 @@ pub fn spawn_texts(mut commands: Commands, asset_server: ResMut<AssetServer>) {
         TextInfo { text_type: 4 },
     ));
 }
-
+#[allow(clippy::too_many_arguments)]
 pub fn handle_board_event(
     mut commands: Commands,
     mut ev_board: EventReader<BoardEvent>,
@@ -244,17 +241,17 @@ pub fn handle_board_event(
                         .find(|(piece, _)| piece.position.0 == to.0 && piece.position.1 == to.1)
                     {
                         if out_piece.is_white {
-                            board.white_out_count = board.white_out_count + 1;
+                            board.white_out_count += 1;
                             out_transform.translation.y = 4.5 * SQUARE_SIZE;
                             out_transform.translation.x = 4. * SQUARE_SIZE
                                 - (SQUARE_SIZE * board.white_out_count as f32 / 4.);
                         } else {
-                            board.black_out_count = board.black_out_count + 1;
+                            board.black_out_count += 1;
                             out_transform.translation.y = -4.5 * SQUARE_SIZE;
                             out_transform.translation.x = -4. * SQUARE_SIZE
                                 + (SQUARE_SIZE * board.black_out_count as f32 / 4.);
                         }
-                        out_transform.scale = out_transform.scale * 0.5;
+                        out_transform.scale *= 0.5;
                         out_piece.position = Position(9, 9);
                     }
                     if let Some((mut piece, mut transform)) = q_piece
@@ -275,9 +272,9 @@ pub fn handle_board_event(
                     board.update_turn(chess.white_turn);
 
                     for (text_info, mut transform, _) in q_texts.iter_mut() {
-                        if text_info.text_type == 3 && chess.white_turn {
-                            transform.scale = Vec3::splat(1.);
-                        } else if text_info.text_type == 4 && !chess.white_turn {
+                        if (text_info.text_type == 3 && chess.white_turn)
+                            || (text_info.text_type == 4 && !chess.white_turn)
+                        {
                             transform.scale = Vec3::splat(1.);
                         } else {
                             transform.scale = Vec3::splat(0.);
@@ -418,7 +415,7 @@ pub fn spawn_pieces(
                     ..default()
                 },
                 Piece {
-                    is_white: code.chars().nth(0).unwrap() == 'w',
+                    is_white: code.starts_with('w'),
                     code: code.to_string(),
                     position: Position(position.0, position.1),
                 },
